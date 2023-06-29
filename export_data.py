@@ -1,3 +1,5 @@
+# install openpyxl if not have yet: pip install openpyxl
+# also pandas to working with Excel: pip install pandas
 import pandas as pd
 import os
 
