@@ -1,0 +1,42 @@
+#Use pip install pandas directly to Pymol to use Pandas
+from pymol import cmd
+import pandas as pd
+
+# Generating a list of strings representing the paths to specific residues in the structure (3KTQ)
+list_1 = []
+for i in range(700, 790):
+    list_1.append("/3ktq_20ns/PROA/P/%s" % i)
+    print("/3ktq_20ns/C/A/%s" % i)
+print(list_1)
+
+# Generating a nested list of strings representing the paths to specific residues in multiple structures (B1 to B18)
+list_2 = []
+for j in range(1, 19):
+    struc = f"/B{j}/PROA/P/"
+    list_2.append([])
+    for i in range(700, 790):
+        list_2[j-1].append("%s%s" % (struc, i))
+
+# List to store the alignment results
+res = []
+
+# Perform the alignments between list_1 and list_2
+for j in range(len(list_2)):
+    res_j = []
+    for i in range(len(list_1)):
+        print(list_1[i], list_2[j][i])
+        alignment = list(cmd.align(list_1[i], list_2[j][i], cutoff=0))
+        res_j.append(alignment[0])
+        print(alignment[0])
+    res.append(res_j)
+
+# Prepare the data for export
+data = {"List 1": list_1}
+for j in range(len(list_2)):
+    data[f"List 2 (B{j+1})"] = list_2[j]
+    data[f"Results (B{j+1})"] = res[j]
+
+# Export the data to Excel
+df_data = pd.DataFrame(data)
+result_file = "C:/Users/darkh/Downloads/test/testPymol/result.xlsx"
+df_data.to_excel(result_file, index=False)
