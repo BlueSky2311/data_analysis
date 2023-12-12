@@ -1,8 +1,14 @@
-set reference [atomselect top "protein" frame 1]
+# set the output file name
+set outfile [open RMSF.txt w]
+# select the protein atoms from the top molecule and set the first frame as the reference structure
+set reference [atomselect 0 "protein" frame 1]
 # the frame being compared
 set compare [atomselect top "protein"]
-set num_steps [molinfo top get numframes]
+# set the number of frames in the trajectory
+# change this value according to your trajectory
+set num_steps 200
 
+# iterate over all the frames
 for {set frame 0} {$frame < $num_steps} {incr frame} {
   # get the correct frame
   $compare frame $frame
@@ -14,11 +20,17 @@ for {set frame 0} {$frame < $num_steps} {incr frame} {
 }
 
 
-set outfile [open RMSF.txt w]
+# select the alpha-carbon atoms of the protein
 set sel [atomselect top "name CA"]
-#puts $outfile "[measure rmsf $sel first 1 last 2000 step 1]"
-set rmsf [measure rmsf $sel first 0 last 4999 step 1]
+# calculate the RMSF over the entire trajectory
+# change the range of frames according to your needs
+set rmsf [measure rmsf $sel first 0 last 199 step 1]
+# write the RMSF values to the output file
 for {set i 0} {$i < [$sel num]} {incr i} {
   puts $outfile "[expr {$i+1}] [lindex $rmsf $i]"
 } 
+# close the file and delete the selections
 close $outfile
+$compare delete
+$reference delete
+$sel delete
